@@ -1,20 +1,9 @@
-Used msys2 to compile libcurl with slighly modified PKGBUILD to
-avoid strtok_r which seems to be introduced in GCC 5.1:
+This libcurl was built with msys2. We only added
 
-  curl_disallow_strtok_r=yes ../${_realname}-${pkgver}/configure \
-    --prefix=${MINGW_PREFIX} \
-    --build=${MINGW_CHOST} \
-    --host=${MINGW_CHOST} \
-    --target=${MINGW_CHOST} \
-    --without-random \
-    --enable-static \
-    --enable-shared \
-    --enable-sspi \
-    --enable-ipv6 \
-    "${_variant_config[@]}" \
-    "${extra_config[@]}"
-  make
+  export curl_disallow_strtok_r="yes"
 
-All static dependency libraries were grabbed from msys2 repos except for 
-librtmp.a which I kept from the previous version (from the libcurl website).
+To the PKGBUILD before running ./configure to make the
+library compatible with gcc-4.6.3.
 
+All other sources were grabbed from msys2 repo except for
+librtmp which was taken from the libcurl website.
