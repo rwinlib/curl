@@ -1,10 +1,13 @@
 This libcurl was built with msys2. We only added
 
 	export curl_disallow_strtok_r="yes"
- 	export CPPFLAGS+=" -DNGHTTP2_STATICLIB"
 
-To the PKGBUILD before running ./configure to make the
-library compatible with gcc-4.6.3.
+The OpenSSL build has to be linked using:
 
-All other sources were grabbed from msys2 repo except for
-librtmp which was taken from the libcurl website.
+    -lcurl -lssh2 -lz -lssl -lcrypto -lgdi32 -lws2_32 -lcrypt32 -lwldap32
+	
+The WinSSL (native SecureChannel) build has to be linked using:
+
+    -lcurl -lz -lws2_32 -lcrypt32 -lwldap32
+	
+Both libs were compiled with native Windows SSPI and IDN.
