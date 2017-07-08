@@ -86,6 +86,7 @@ build() {
     _variant_config+=('--with-nghttp2=${MINGW_PREFIX}/')
   fi
   export curl_disallow_strtok_r="yes"
+  export CPPFLAGS="-DUSE_WIN32_IDN -DWINVER=0x0600"
   cd "${srcdir}/build-${CARCH}"
   ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -96,7 +97,7 @@ build() {
     --enable-static \
     --enable-shared \
     --enable-sspi \
-    --without-libssh2 --without-librtmp --with-winidn \
+    --without-libssh2 --without-librtmp --without-libidn2 --with-winidn \
     --with-libmetalink=${MINGW_PREFIX} \
     "${_variant_config[@]}" \
     "${extra_config[@]}"

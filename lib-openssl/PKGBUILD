@@ -85,6 +85,7 @@ build() {
     _variant_config+=("--with-ca-bundle=${MINGW_PREFIX}/ssl/certs/ca-bundle.crt")
   fi
   export curl_disallow_strtok_r="yes"
+  export CPPFLAGS="-DUSE_WIN32_IDN -DWINVER=0x0600"
   cd "${srcdir}/build-${CARCH}"
   ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -95,7 +96,7 @@ build() {
     --enable-static \
     --enable-shared \
     --enable-sspi \
-    --without-librtmp --with-winidn --without-nghttp2 \
+    --without-librtmp --with-winidn --without-libidn2 --without-nghttp2 \
     --with-libmetalink=${MINGW_PREFIX} \
     "${_variant_config[@]}" \
     "${extra_config[@]}"
