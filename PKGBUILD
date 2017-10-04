@@ -1,6 +1,6 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
-_variant=-openssl
-#_variant=-winssl
+#_variant=-openssl
+_variant=-winssl
 #_variant=-gnutls
 
 if [ "${_variant}" = "-openssl" ]; then
@@ -12,16 +12,15 @@ fi
 _realname=curl
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}${_namesuff}"
-pkgver=7.54.1
-pkgrel=1
-pkgdesc="An URL retrival utility and library. (mingw-w64)"
+pkgver=7.56.0
+pkgrel=2
+pkgdesc="Command line tool and library for transferring data with URLs. (mingw-w64)"
 arch=('any')
 url="https://curl.haxx.se"
 license=("MIT")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-pkg-config")
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-c-ares"
-         "${MINGW_PACKAGE_PREFIX}-libidn"
          "${MINGW_PACKAGE_PREFIX}-libmetalink"
          "${MINGW_PACKAGE_PREFIX}-libssh2"
          "${MINGW_PACKAGE_PREFIX}-zlib"
@@ -42,7 +41,7 @@ options=('staticlibs')
 source=("${url}/download/${_realname}-${pkgver}.tar.bz2"{,.asc}
         "0001-Make-cURL-relocatable.patch"
         "0002-cURL-Get-relocatable-base-from-.dll-instead-of-.exe.patch")
-sha256sums=('fdfc4df2d001ee0c44ec071186e770046249263c491fcae48df0e1a3ca8f25a0'
+sha256sums=('e5b1a92ed3b0c11f149886458fa063419500819f1610c020d62f25b8e4b16cfb'
             'SKIP'
             '577e900086f91adb332f5ddb95adce980c530445d22aa0fbf4b43b25c2efe80e'
             '604b34b5ca9b3520a83a23959f943e330c1ef36b50ee377f8210b59be3e5f62b')
@@ -53,8 +52,6 @@ validpgpkeys=('914C533DF9B2ADA2204F586D78E11C6B279D5C91'  # Daniel Stenberg
 prepare() {
   cd "${_realname}-${pkgver}"
   rm -f lib/pathtools.h lib/pathtools.c > /dev/null 2>&1 || true
-  patch -p1 -i "${srcdir}/0001-Make-cURL-relocatable.patch"
-  patch -p1 -i "${srcdir}/0002-cURL-Get-relocatable-base-from-.dll-instead-of-.exe.patch"
   autoreconf -vfi
 }
 
@@ -68,7 +65,7 @@ build() {
   mkdir -p "${srcdir}/build-${CARCH}"
   local -a _variant_config
   if [ "${_variant}" = "-winssl" ]; then
-    _variant_config+=("--without-ssl")
+    _variant_config+=("--with-ssl")
     _variant_config+=("--without-gnutls")
     _variant_config+=("--with-winssl")
     _variant_config+=('--without-nghttp2')
@@ -83,21 +80,23 @@ build() {
     _variant_config+=("--without-gnutls")
     _variant_config+=("--with-ssl")
     _variant_config+=("--with-ca-bundle=${MINGW_PREFIX}/ssl/certs/ca-bundle.crt")
+    _variant_config+=('--with-nghttp2=${MINGW_PREFIX}/')
   fi
-  export curl_disallow_strtok_r="yes"
-  export CPPFLAGS="-DUSE_WIN32_IDN -DWINVER=0x0600"
   cd "${srcdir}/build-${CARCH}"
+  export curl_disallow_strtok_r="yes"
   ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
     --without-random \
+    --without-libssh2 \
     --enable-static \
-    --enable-shared \
+    --disable-shared \
     --enable-sspi \
-    --without-librtmp --with-winidn --without-libidn2 --without-nghttp2 \
-    --with-libmetalink=${MINGW_PREFIX} \
+    --without-librtmp \
+    --without-libidn2 \
+    --with-winidn \
     "${_variant_config[@]}" \
     "${extra_config[@]}"
 # there's a bug with zsh completion generation script and Windows.
