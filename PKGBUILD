@@ -12,7 +12,7 @@ fi
 _realname=curl
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}${_namesuff}"
-pkgver=7.56.0
+pkgver=7.56.1
 pkgrel=1
 pkgdesc="Command line tool and library for transferring data with URLs. (mingw-w64)"
 arch=('any')
@@ -38,8 +38,7 @@ fi
 options=('staticlibs')
 source=("${url}/download/${_realname}-${pkgver}.tar.bz2"{,.asc}
         "0001-Make-cURL-relocatable.patch"
-        "0002-cURL-Get-relocatable-base-from-.dll-instead-of-.exe.patch"
-        "largebuf.patch")
+	"0002-cURL-Get-relocatable-base-from-.dll-instead-of-.exe.patch")
 sha256sums=('de60a4725a3d461c70aa571d7d69c788f1816d9d1a8a2ef05f864ce8f01279df'
             'SKIP'
             '3008bbfa20f2b23d57db0c4b844af877bd0ad50be7a06148ff5b7b7dc0386f1e'
@@ -54,7 +53,6 @@ prepare() {
   rm -f lib/pathtools.h lib/pathtools.c > /dev/null 2>&1 || true
   patch -p1 -i "${srcdir}/0001-Make-cURL-relocatable.patch"
   patch -p1 -i "${srcdir}/0002-cURL-Get-relocatable-base-from-.dll-instead-of-.exe.patch"
-  patch -p1 -i "${srcdir}/largebuf.patch"  
   autoreconf -vfi
 }
 
@@ -96,7 +94,7 @@ build() {
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
     --without-random \
-    --without-libssh2 \
+    --with-libssh2 \
     --enable-static \
     --disable-shared \
     --enable-sspi \
